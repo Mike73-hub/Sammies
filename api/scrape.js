@@ -22,8 +22,7 @@ export default async function handler(req, res) {
         .trim();
 
       items.push({
-        title,
-        description
+        text: `${title}\n${description}`
       });
     });
 
