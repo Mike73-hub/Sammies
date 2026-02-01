@@ -23,12 +23,13 @@ export default async function handler(req, res) {
 
       items.push({
          title,
-         description,
-         newline: "\n"
+         description
       });
     });
 
-    return res.status(200).json(items);
+    return res
+      .status(200)
+      .send(JSON.stringify(items, null, 2));
 
   } catch (err) {
     return res.status(500).json({ error: err.message });
