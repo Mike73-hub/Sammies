@@ -11,7 +11,7 @@ export default async function handler(req, res) {
 
     const html = await response.text();
 
-    // 👇 NOW it's valid — html exists here
+    // Log the HTML AFTER it exists
     console.log(html);
 
     const $ = cheerio.load(html);
@@ -31,9 +31,11 @@ export default async function handler(req, res) {
       });
     });
 
+    // Return JSON (not pretty text)
     return res.status(200).json(items);
 
   } catch (err) {
+    console.error("SCRAPER ERROR:", err);
     return res.status(500).json({ error: err.message });
   }
 }
