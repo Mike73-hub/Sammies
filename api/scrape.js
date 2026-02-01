@@ -14,6 +14,7 @@ export default async function handler(req, res) {
 
     const items = [];
 
+    // Loop through each menu item
     $(".menu-item-title").each((i, el) => {
       const title = $(el).text().trim();
       const description = $(el)
@@ -22,14 +23,15 @@ export default async function handler(req, res) {
         .trim();
 
       items.push({
-         title,
-         description
+        title,
+        description
       });
     });
 
-    return res
-      .status(200)
-      .send(JSON.stringify(items, null, 2));
+    // ⭐ Pretty-print the JSON with newlines between items
+    const pretty = JSON.stringify(items, null, 2);
+
+    return res.status(200).send(pretty);
 
   } catch (err) {
     return res.status(500).json({ error: err.message });
