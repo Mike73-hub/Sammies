@@ -10,12 +10,14 @@ export default async function handler(req, res) {
     });
 
     const html = await response.text();
+
+    // ⭐ Load HTML into Cheerio
     const $ = cheerio.load(html);
 
-    // We'll parse the menu next
+    // ⭐ Prepare final menu array
     const menu = [];
 
-    // Wix menu sections are usually inside <section> or <div> blocks
+    // ⭐ Loop through each menu section
     $(".comp-menus-item").each((i, el) => {
       const category = $(el).find(".comp-menus-category-title").text().trim();
 
@@ -28,6 +30,7 @@ export default async function handler(req, res) {
             .find(".comp-menus-item-title")
             .text()
             .trim();
+
           const description = $(itemEl)
             .find(".comp-menus-item-description")
             .text()
@@ -38,15 +41,13 @@ export default async function handler(req, res) {
             .text()
             .trim();
 
-          const image = $(itemEl)
-            .find("img")
-            .attr("src");
+          const image = $(itemEl).find("img").attr("src") || null;
 
           items.push({
             title,
             description,
             price,
-            image: image || null
+            image
           });
         });
 
@@ -55,7 +56,9 @@ export default async function handler(req, res) {
       }
     });
 
+    // ⭐ Return JSON instead of HTML
     return res.status(200).json(menu);
+
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
