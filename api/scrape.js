@@ -10,54 +10,24 @@ export default async function handler(req, res) {
     });
 
     const html = await response.text();
-
-    // ⭐ Load HTML into Cheerio
     const $ = cheerio.load(html);
 
-    // ⭐ Prepare final menu array
-    const menu = [];
+    const items = [];
 
-    // ⭐ Loop through each menu section
-    $(".comp-menus-item").each((i, el) => {
-      const category = $(el).find(".comp-menus-category-title").text().trim();
+    $(".menu-item-title").each((i, el) => {
+      const title = $(el).text().trim();
+      const description = $(el)
+        .siblings(".menu-item-description")
+        .text()
+        .trim();
 
-      const items = [];
-
-      $(el)
-        .find(".comp-menus-item-row")
-        .each((j, itemEl) => {
-          const title = $(itemEl)
-            .find(".comp-menus-item-title")
-            .text()
-            .trim();
-
-          const description = $(itemEl)
-            .find(".comp-menus-item-description")
-            .text()
-            .trim();
-
-          const price = $(itemEl)
-            .find(".comp-menus-item-price")
-            .text()
-            .trim();
-
-          const image = $(itemEl).find("img").attr("src") || null;
-
-          items.push({
-            title,
-            description,
-            price,
-            image
-          });
-        });
-
-      if (category && items.length > 0) {
-        menu.push({ category, items });
-      }
+      items.push({
+        title,
+        description
+      });
     });
 
-    // ⭐ Return JSON instead of HTML
-    return res.status(200).json(menu);
+    return res.status(200).json(items);
 
   } catch (err) {
     return res.status(500).json({ error: err.message });
