@@ -1,15 +1,61 @@
+const cheerio = require("cheerio");
+
 export default async function handler(req, res) {
   try {
     const response = await fetch("https://www.luciastaqueria.com/", {
       headers: {
         "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0",
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0"
       }
     });
 
     const html = await response.text();
-    return res.status(200).send(html);
+    const $ = cheerio.load(html);
 
+    // We'll parse the menu next
+    const menu = [];
+
+    // Wix menu sections are usually inside <section> or <div> blocks
+    $(".comp-menus-item").each((i, el) => {
+      const category = $(el).find(".comp-menus-category-title").text().trim();
+
+      const items = [];
+
+      $(el)
+        .find(".comp-menus-item-row")
+        .each((j, itemEl) => {
+          const title = $(itemEl)
+            .find(".comp-menus-item-title")
+            .text()
+            .trim();
+          const description = $(itemEl)
+            .find(".comp-menus-item-description")
+            .text()
+            .trim();
+
+          const price = $(itemEl)
+            .find(".comp-menus-item-price")
+            .text()
+            .trim();
+
+          const image = $(itemEl)
+            .find("img")
+            .attr("src");
+
+          items.push({
+            title,
+            description,
+            price,
+            image: image || null
+          });
+        });
+
+      if (category && items.length > 0) {
+        menu.push({ category, items });
+      }
+    });
+
+    return res.status(200).json(menu);
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
