@@ -9,14 +9,15 @@ export default async function handler(req, res) {
       }
     });
 
+    const html = await response.text();
+
+    // 👇 NOW it's valid — html exists here
     console.log(html);
 
-    const html = await response.text();
     const $ = cheerio.load(html);
 
     const items = [];
 
-    // Loop through each menu item
     $(".menu-item-title").each((i, el) => {
       const title = $(el).text().trim();
       const description = $(el)
@@ -30,10 +31,7 @@ export default async function handler(req, res) {
       });
     });
 
-    // ⭐ Pretty-print the JSON with newlines between items
-    const pretty = JSON.stringify(items, null, 2);
-
-    return res.status(200).send(pretty);
+    return res.status(200).json(items);
 
   } catch (err) {
     return res.status(500).json({ error: err.message });
