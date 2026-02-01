@@ -9,6 +9,8 @@ export default async function handler(req, res) {
       }
     });
 
+    console.log(html);
+
     const html = await response.text();
     const $ = cheerio.load(html);
 
